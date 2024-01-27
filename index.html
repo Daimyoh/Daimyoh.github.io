@@ -130,36 +130,46 @@
 <body>
     <h1>Phone Pendulum</h1>
     <button id="startButton">Start Pendulum</button>
-    <p>Angle: <span id="angle">0</span> degrees</p>
+    <p>Vertical Angle: <span id="angle">0</span> degrees</p>
     <p>Linear Speed: <span id="speed">0</span> m/s</p>
 
     <script>
         let startTime;
-        let startAngle;
+        let startBeta;
+        const armLength = 0.7; // Longueur de votre bras en mètres
 
         function handleOrientation(event) {
-            const alpha = event.alpha; // Angle par rapport au nord, en degrés
+            const beta = event.beta; // Angle par rapport à la verticale, en degrés
 
-            if (alpha !== null) {
+            if (beta !== null) {
                 if (startTime === undefined) {
                     // Première mesure
                     startTime = new Date().getTime();
-                    startAngle = alpha;
+                    startBeta = beta;
                 } else {
                     // Calcul de la différence d'angle et du temps écoulé
                     const deltaTime = (new Date().getTime() - startTime) / 1000; // en secondes
-                    const deltaAngle = alpha - startAngle;
+                    const deltaBeta = beta - startBeta;
 
                     // Calcul de la vitesse angulaire (en degrés par seconde)
-                    const angularSpeed = deltaAngle / deltaTime;
+                    const angularSpeed = deltaBeta / deltaTime;
 
-                    // Affichage de l'angle et de la vitesse
-                    document.getElementById('angle').innerText = alpha.toFixed(2);
-                    document.getElementById('speed').innerText = angularSpeed.toFixed(2);
+                    // Conversion de l'angle en radians
+                    const angleRadians = (beta * Math.PI) / 180;
+
+                    // Calcul de la distance parcourue le long de l'arc
+                    const distance = angleRadians * armLength;
+
+                    // Calcul de la vitesse linéaire
+                    const linearSpeed = distance / deltaTime;
+
+                    // Affichage de l'angle, de la vitesse angulaire et de la vitesse linéaire
+                    document.getElementById('angle').innerText = beta.toFixed(2);
+                    document.getElementById('speed').innerText = linearSpeed.toFixed(2);
 
                     // Mise à jour des valeurs pour la prochaine itération
                     startTime = new Date().getTime();
-                    startAngle = alpha;
+                    startBeta = beta;
                 }
             }
         }
@@ -171,3 +181,4 @@
     </script>
 </body>
 </html>
+
