@@ -136,7 +136,7 @@
     <script>
         let startTime;
         let startBeta;
-        let startAngularSpeed;
+        let maxAngularSpeed;
         const armLength = 0.7; // Longueur de votre bras en mètres
 
         function handleOrientation(event) {
@@ -147,7 +147,7 @@
                     // Première mesure
                     startTime = new Date().getTime();
                     startBeta = beta;
-                    startAngularSpeed = 0;
+                    maxAngularSpeed = 0;
                 } else {
                     // Calcul de la différence d'angle et du temps écoulé
                     const deltaTime = (new Date().getTime() - startTime) / 1000; // en secondes
@@ -157,25 +157,18 @@
                     const angularAcceleration = deltaBeta / deltaTime;
 
                     // Calcul de la vitesse angulaire (en degrés par seconde)
-                    const angularSpeed = startAngularSpeed + angularAcceleration * deltaTime;
+                    const angularSpeed = angularAcceleration * deltaTime;
 
-                    // Conversion de l'angle en radians
-                    const angleRadians = (beta * Math.PI) / 180;
+                    // Mise à jour de la vitesse angulaire maximale
+                    maxAngularSpeed = Math.max(maxAngularSpeed, Math.abs(angularSpeed));
 
-                    // Calcul de la distance parcourue le long de l'arc
-                    const distance = angleRadians * armLength;
-
-                    // Calcul de la vitesse linéaire
-                    const linearSpeed = distance / deltaTime;
-
-                    // Affichage de l'angle, de la vitesse angulaire et de la vitesse linéaire
+                    // Affichage de l'angle, de la vitesse angulaire maximale et de la vitesse linéaire
                     document.getElementById('angle').innerText = beta.toFixed(2);
-                    document.getElementById('speed').innerText = linearSpeed.toFixed(2);
+                    document.getElementById('speed').innerText = maxAngularSpeed.toFixed(2);
 
                     // Mise à jour des valeurs pour la prochaine itération
                     startTime = new Date().getTime();
                     startBeta = beta;
-                    startAngularSpeed = angularSpeed;
                 }
             }
         }
@@ -187,4 +180,3 @@
     </script>
 </body>
 </html>
-
