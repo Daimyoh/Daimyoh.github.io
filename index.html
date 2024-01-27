@@ -136,6 +136,7 @@
     <script>
         let startTime;
         let startBeta;
+        let startAngularSpeed;
         const armLength = 0.7; // Longueur de votre bras en mètres
 
         function handleOrientation(event) {
@@ -146,13 +147,17 @@
                     // Première mesure
                     startTime = new Date().getTime();
                     startBeta = beta;
+                    startAngularSpeed = 0;
                 } else {
                     // Calcul de la différence d'angle et du temps écoulé
                     const deltaTime = (new Date().getTime() - startTime) / 1000; // en secondes
                     const deltaBeta = beta - startBeta;
 
+                    // Calcul de l'accélération angulaire (en degrés par seconde carrée)
+                    const angularAcceleration = deltaBeta / deltaTime;
+
                     // Calcul de la vitesse angulaire (en degrés par seconde)
-                    const angularSpeed = deltaBeta / deltaTime;
+                    const angularSpeed = startAngularSpeed + angularAcceleration * deltaTime;
 
                     // Conversion de l'angle en radians
                     const angleRadians = (beta * Math.PI) / 180;
@@ -170,6 +175,7 @@
                     // Mise à jour des valeurs pour la prochaine itération
                     startTime = new Date().getTime();
                     startBeta = beta;
+                    startAngularSpeed = angularSpeed;
                 }
             }
         }
