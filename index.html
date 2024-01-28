@@ -155,7 +155,7 @@
             document.getElementById('acceleration').innerText = linearAcceleration.toFixed(2);
 
             // Vérification de la plage d'accélération et émission d'un "bip"
-            if (linearAcceleration >= accelerationThresholdLow && linearAcceleration <= accelerationThresholdHigh) {
+            if (linearAcceleration>=10){//(linearAcceleration >= accelerationThresholdLow && linearAcceleration <= accelerationThresholdHigh) {
                 beep();
             }
             else{
