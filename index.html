@@ -131,17 +131,18 @@
     <button id="startButton">Start Pendulum</button>
     <p>Vertical Angle: <span id="angle">0</span> degrees</p>
     <p>Linear Speed: <span id="speed">0</span> m/s</p>
-    <p>Max Linear Acceleration (last 5 seconds): <span id="maxAcceleration">0</span> m/s²</p>
+    <p>Linear Acceleration: <span id="acceleration">0</span> m/s²</p>
 
     <script>
         let startTime;
         let startBeta;
         let maxAngularSpeed;
         let lastLinearSpeed;
-        let accelerationData = [];
         const armLength = 0.7; // Longueur de votre bras en mètres
         const accelerationThresholdLow = 9; // Seuil d'accélération bas en m/s²
         const accelerationThresholdHigh = 11; // Seuil d'accélération haut en m/s²
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let oscillator;
 
         function handleMotion(event) {
             const accelerationX = event.acceleration.x;
@@ -151,21 +152,30 @@
             // Calcul de l'accélération linéaire
             const linearAcceleration = Math.sqrt(accelerationX**2 + accelerationY**2 + accelerationZ**2);
 
-            // Mise à jour de l'ensemble de données d'accélération
-            accelerationData.push(linearAcceleration);
+            // Affichage de l'accélération linéaire
+            document.getElementById('acceleration').innerText = linearAcceleration.toFixed(2);
 
-            // Nettoyer les données plus anciennes que 5 secondes
-            const currentTime = new Date().getTime();
-            accelerationData = accelerationData.filter(entry => currentTime - entry.time < 5000);
+            // Vérification de la plage d'accélération et émission d'un son
+            if (linearAcceleration > 30) {
+                playSound();
+            }
+        }
 
-            // Calculer le maximum de l'accélération linéaire dans la fenêtre de 5 secondes
-            const maxAcceleration = accelerationData.reduce((max, entry) => Math.max(max, entry.value), 0);
+        function playSound() {
+            if (!oscillator) {
+                oscillator = audioContext.createOscillator();
+                oscillator.type = 'sine'; // Vous pouvez changer le type d'onde selon vos préférences
+                oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // Fréquence en Hz
+                oscillator.connect(audioContext.destination);
+                oscillator.start();
+            }
+        }
 
-            // Affichage de l'accélération linéaire maximale dans les 5 dernières secondes
-            document.getElementById('maxAcceleration').innerText = maxAcceleration.toFixed(2);
-
-            if (linearAcceleration >= accelerationThresholdLow && linearAcceleration <= accelerationThresholdHigh) {
-                beep();
+        function stopSound() {
+            if (oscillator) {
+                oscillator.stop();
+                oscillator.disconnect();
+                oscillator = null;
             }
         }
 
@@ -179,7 +189,6 @@
                     startBeta = beta;
                     maxAngularSpeed = 0;
                     lastLinearSpeed = 0;
-                    accelerationData = [];
                 } else {
                     // Calcul de la différence d'angle et du temps écoulé
                     const deltaTime = (new Date().getTime() - startTime) / 1000; // en secondes
@@ -203,7 +212,8 @@
                     // Calcul de la vitesse linéaire
                     const linearSpeed = distance / deltaTime;
 
-                    // Affichage de l'angle et de la vitesse angulaire maximale
+                    // Affichage de l'angle, de la vitesse angulaire maximale, de la vitesse linéaire
+                    // et de l'accélération linéaire
                     document.getElementById('angle').innerText = beta.toFixed(2);
                     document.getElementById('speed').innerText = maxAngularSpeed.toFixed(2);
 
@@ -211,6 +221,11 @@
                     startTime = new Date().getTime();
                     startBeta = beta;
                     lastLinearSpeed = linearSpeed;
+
+                    // Arrêt du son si l'accélération ne dépasse pas le seuil
+                    if (linearSpeed <= 30) {
+                        stopSound();
+                    }
                 }
             }
         }
@@ -229,4 +244,3 @@
     </script>
 </body>
 </html>
-
