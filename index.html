@@ -136,6 +136,7 @@
     <p>Linear Acceleration: <span id="acceleration">0</span> m/s²</p>
 
     <script>
+        let calibrationMode = false;
         let startTime;
         let startBeta;
         let maxAngularSpeed;
@@ -147,6 +148,10 @@
         const accelerationThresholdHigh = 55; // Seuil d'accélération haut en m/s²
 
         function handleMotion(event) {
+            if (calibrationMode) {
+                return; // Ne rien faire en mode de calibrage
+            }
+
             const accelerationX = event.accelerationIncludingGravity.x;
             const accelerationY = event.accelerationIncludingGravity.y;
             const accelerationZ = event.accelerationIncludingGravity.z;
@@ -155,10 +160,12 @@
             const linearAcceleration = Math.sqrt(accelerationX**2 + accelerationY**2 + accelerationZ**2);
 
             // Affichage de l'accélération linéaire
-            document.getElementById('acceleration').innerText = linearAcceleration.toFixed(2);
+            document.getElementById('acceleration').innerText = calibrationMode ? "0.00" : linearAcceleration.toFixed(2);
 
             // Mise à jour de la valeur maximale d'accélération
-            maxLinearAcceleration = Math.max(maxLinearAcceleration, linearAcceleration);
+            if (!calibrationMode) {
+                maxLinearAcceleration = Math.max(maxLinearAcceleration, linearAcceleration);
+            }
 
             // Vérification de la plage d'accélération et émission d'un "bip"
             if (linearAcceleration >= accelerationThresholdLow && linearAcceleration <= accelerationThresholdHigh) {
@@ -168,6 +175,10 @@
 
         function handleOrientation(event) {
             const beta = event.beta; // Angle par rapport à la verticale, en degrés
+
+            if (calibrationMode) {
+                return; // Ne rien faire en mode de calibrage
+            }
 
             if (beta !== null) {
                 if (startTime === undefined) {
@@ -221,13 +232,15 @@
 
         // Écouteur d'événement pour le bouton "Start Pendulum"
         document.getElementById('startButton').addEventListener('click', function () {
+            calibrationMode = false; // Sortir du mode de calibrage
             window.addEventListener('devicemotion', handleMotion);
             window.addEventListener('deviceorientation', handleOrientation);
         });
 
         // Écouteur d'événement pour le bouton "Phase de calibrage"
         document.getElementById('calibrationButton').addEventListener('click', function () {
-            document.getElementById('acceleration').innerText = maxLinearAcceleration.toFixed(2);
+            calibrationMode = true; // Entrer en mode de calibrage
+            document.getElementById('acceleration').innerText = "0.00"; // Réinitialiser l'accélération affichée
             maxLinearAcceleration = 0; // Réinitialisation de la valeur maximale
             startTime = undefined; // Réinitialisation du temps de départ
         });
