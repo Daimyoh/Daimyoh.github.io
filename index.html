@@ -127,18 +127,18 @@
     <title>Phone Pendulum</title>
 </head>
 <body>
-    <h1>Phone Pendulum</h1>
-    <button id="startButton">Start Pendulum</button>
-    <p>Vertical Angle: <span id="angle">0</span> degrees</p>
-    <p>Linear Speed: <span id="speed">0</span> m/s</p>
-    <p>Linear Acceleration: <span id="acceleration">0</span> m/s²</p>
+    <h1>Pétanque assistant</h1>
+    <button id="startButton">Démarrer/button>
+    <p>Angle / verticale: <span id="angle">0</span> degrees</p>
+    <p>Vitesse linéaire: <span id="speed">0</span> m/s</p>
+    <p>Accélération linéaire: <span id="acceleration">0</span> m/s²</p>
 
     <script>
         let startTime;
         let startBeta;
         let maxAngularSpeed;
         let lastLinearSpeed;
-        const armLength = 0.7; // Longueur de votre bras en mètres
+        const armLength = 0.45; // Longueur du bras en mètres
         const accelerationThresholdLow = 20; // Seuil d'accélération bas en m/s²
         const accelerationThresholdHigh = 24; // Seuil d'accélération haut en m/s²
         const angleThresholdLow = -5; // Seuil d'angle bas par rapport à la verticale en degrés
@@ -244,13 +244,8 @@
             }
         }
 
-        // Fonction pour émettre un "bip"
-        function beep() {
-            // Vous pouvez remplacer cette fonction par une notification sonore de votre choix
-            console.log("Bip!");
-        }
 
-        // Écouteur d'événement pour le bouton "Start Pendulum"
+        // Écouteur d'événement pour le bouton "Démarrer"
         document.getElementById('startButton').addEventListener('click', function () {
             window.addEventListener('devicemotion', handleMotion);
             window.addEventListener('deviceorientation', handleOrientation);
