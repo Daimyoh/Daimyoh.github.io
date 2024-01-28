@@ -160,7 +160,7 @@
             const linearAcceleration = Math.sqrt(accelerationX**2 + accelerationY**2 + accelerationZ**2);
 
             // Affichage de l'accélération linéaire
-            document.getElementById('acceleration').innerText = calibrationMode ? "0.00" : linearAcceleration.toFixed(2);
+            document.getElementById('acceleration').innerText = !calibrationMode ? "0.00" : linearAcceleration.toFixed(2);
 
             // Mise à jour de la valeur maximale d'accélération
             if (calibrationMode) {
@@ -241,6 +241,8 @@
         document.getElementById('calibrationButton').addEventListener('click', function () {
             calibrationMode = true; // Entrer en mode de calibrage
             document.getElementById('acceleration').innerText = "0.00"; // Réinitialiser l'accélération affichée
+            window.addEventListener('devicemotion', handleMotion);
+            window.addEventListener('deviceorientation', handleOrientation);
             maxLinearAcceleration = 0; // Réinitialisation de la valeur maximale
             startTime = undefined; // Réinitialisation du temps de départ
         });
