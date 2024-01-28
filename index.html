@@ -139,8 +139,8 @@
         let maxAngularSpeed;
         let lastLinearSpeed;
         const armLength = 0.7; // Longueur de votre bras en mètres
-        const accelerationThresholdLow = 9; // Seuil d'accélération bas en m/s²
-        const accelerationThresholdHigh = 11; // Seuil d'accélération haut en m/s²
+        const accelerationThresholdLow = 30; // Seuil d'accélération bas en m/s²
+        const accelerationThresholdHigh = 40; // Seuil d'accélération haut en m/s²
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         let oscillator;
 
@@ -156,8 +156,10 @@
             document.getElementById('acceleration').innerText = linearAcceleration.toFixed(2);
 
             // Vérification de la plage d'accélération et émission d'un son
-            if (linearAcceleration > 30) {
+            if (linearAcceleration > accelerationThresholdLow && linearAcceleration <= accelerationThresholdHigh) {
                 playSound();
+            } else {
+                stopSound();
             }
         }
 
@@ -221,11 +223,6 @@
                     startTime = new Date().getTime();
                     startBeta = beta;
                     lastLinearSpeed = linearSpeed;
-
-                    // Arrêt du son si l'accélération ne dépasse pas le seuil
-                    if (linearSpeed <= 30) {
-                        stopSound();
-                    }
                 }
             }
         }
@@ -244,3 +241,4 @@
     </script>
 </body>
 </html>
+
