@@ -229,6 +229,7 @@
         document.getElementById('calibrationButton').addEventListener('click', function () {
             document.getElementById('acceleration').innerText = maxLinearAcceleration.toFixed(2);
             maxLinearAcceleration = 0; // Réinitialisation de la valeur maximale
+            startTime = undefined; // Réinitialisation du temps de départ
         });
     </script>
 </body>
