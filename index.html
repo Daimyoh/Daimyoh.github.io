@@ -143,9 +143,9 @@
         const accelerationThresholdHigh = 11; // Seuil d'accélération haut en m/s²
 
         function handleMotion(event) {
-            const accelerationX = event.accelerationIncludingGravity.x;
-            const accelerationY = event.accelerationIncludingGravity.y;
-            const accelerationZ = event.accelerationIncludingGravity.z;
+            const accelerationX = event.acceleration.x;
+            const accelerationY = event.acceleration.y;
+            const accelerationZ = event.acceleration.z;
 
             // Calcul de l'accélération linéaire
             const linearAcceleration = Math.sqrt(accelerationX**2 + accelerationY**2 + accelerationZ**2);
