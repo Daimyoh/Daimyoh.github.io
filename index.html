@@ -129,18 +129,14 @@
 </head>
 <body>
     <h1>Phone Pendulum</h1>
-    <button id="startButton">Start Pendulum</button>
     <button id="calibrationButton">Phase de calibrage</button>
     <p>Vertical Angle: <span id="angle">0</span> degrees</p>
-    <p>Linear Speed: <span id="speed">0</span> m/s</p>
-    <p>Linear Acceleration: <span id="acceleration">0</span> m/s²</p>
+    <p>Max Linear Acceleration: <span id="maxAcceleration">0</span> m/s²</p>
 
     <script>
         let calibrationMode = false;
         let startTime;
         let startBeta;
-        let maxAngularSpeed;
-        let lastLinearSpeed;
         let maxLinearAcceleration;
         const armLength = 0.7; // Longueur de votre bras en mètres
 
@@ -159,68 +155,18 @@
             // Calcul de l'accélération linéaire
             const linearAcceleration = Math.sqrt(accelerationX**2 + accelerationY**2 + accelerationZ**2);
 
-            // Affichage de l'accélération linéaire
-            document.getElementById('acceleration').innerText = !calibrationMode ? "0.00" : linearAcceleration.toFixed(2);
-
             // Mise à jour de la valeur maximale d'accélération
-            if (calibrationMode) {
+            if (!calibrationMode) {
                 maxLinearAcceleration = Math.max(maxLinearAcceleration, linearAcceleration);
             }
+
+            // Affichage de l'angle
+            const beta = event.beta;
+            document.getElementById('angle').innerText = beta.toFixed(2);
 
             // Vérification de la plage d'accélération et émission d'un "bip"
             if (linearAcceleration >= accelerationThresholdLow && linearAcceleration <= accelerationThresholdHigh) {
                 beep();
-            }
-        }
-
-        function handleOrientation(event) {
-            const beta = event.beta; // Angle par rapport à la verticale, en degrés
-
-            if (calibrationMode) {
-                return; // Ne rien faire en mode de calibrage
-            }
-
-            if (beta !== null) {
-                if (startTime === undefined) {
-                    // Première mesure
-                    startTime = new Date().getTime();
-                    startBeta = beta;
-                    maxAngularSpeed = 0;
-                    lastLinearSpeed = 0;
-                    maxLinearAcceleration = 0;
-                } else {
-                    // Calcul de la différence d'angle et du temps écoulé
-                    const deltaTime = (new Date().getTime() - startTime) / 1000; // en secondes
-                    const deltaBeta = beta - startBeta;
-
-                    // Calcul de l'accélération angulaire (en degrés par seconde carrée)
-                    const angularAcceleration = deltaBeta / deltaTime;
-
-                    // Calcul de la vitesse angulaire (en degrés par seconde)
-                    const angularSpeed = angularAcceleration * deltaTime;
-
-                    // Mise à jour de la vitesse angulaire maximale
-                    maxAngularSpeed = Math.max(maxAngularSpeed, Math.abs(angularSpeed));
-
-                    // Conversion de l'angle en radians
-                    const angleRadians = (beta * Math.PI) / 180;
-
-                    // Calcul de la distance parcourue le long de l'arc
-                    const distance = angleRadians * armLength;
-
-                    // Calcul de la vitesse linéaire
-                    const linearSpeed = distance / deltaTime;
-
-                    // Affichage de l'angle, de la vitesse angulaire maximale, de la vitesse linéaire
-                    // et de l'accélération linéaire
-                    document.getElementById('angle').innerText = beta.toFixed(2);
-                    document.getElementById('speed').innerText = maxAngularSpeed.toFixed(2);
-
-                    // Mise à jour des valeurs pour la prochaine itération
-                    startTime = new Date().getTime();
-                    startBeta = beta;
-                    lastLinearSpeed = linearSpeed;
-                }
             }
         }
 
@@ -230,22 +176,15 @@
             console.log("Bip!");
         }
 
-        // Écouteur d'événement pour le bouton "Start Pendulum"
-        document.getElementById('startButton').addEventListener('click', function () {
-            calibrationMode = false; // Sortir du mode de calibrage
-            window.addEventListener('devicemotion', handleMotion);
-            window.addEventListener('deviceorientation', handleOrientation);
-        });
-
         // Écouteur d'événement pour le bouton "Phase de calibrage"
         document.getElementById('calibrationButton').addEventListener('click', function () {
             calibrationMode = true; // Entrer en mode de calibrage
-            document.getElementById('acceleration').innerText = "0.00"; // Réinitialiser l'accélération affichée
-            window.addEventListener('devicemotion', handleMotion);
-            window.addEventListener('deviceorientation', handleOrientation);
+            document.getElementById('maxAcceleration').innerText = maxLinearAcceleration.toFixed(2); // Afficher la valeur maximale d'accélération
             maxLinearAcceleration = 0; // Réinitialisation de la valeur maximale
-            startTime = undefined; // Réinitialisation du temps de départ
         });
+
+        // Événement pour le capteur de mouvement
+        window.addEventListener('devicemotion', handleMotion);
     </script>
 </body>
 </html>
