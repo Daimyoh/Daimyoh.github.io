@@ -133,15 +133,15 @@
     <p>Vertical Angle: <span id="angle">0</span> degrees</p>
     <p>Linear Speed: <span id="speed">0</span> m/s</p>
     <p>Linear Acceleration: <span id="acceleration">0</span> m/s²</p>
-
+    <script src="audio.js"></script>
     <script>
         let startTime;
         let startBeta;
         let maxAngularSpeed;
         let lastLinearSpeed;
         const armLength = 0.7; // Longueur de votre bras en mètres
-        const accelerationThresholdLow = 9; // Seuil d'accélération bas en m/s²
-        const accelerationThresholdHigh = 11; // Seuil d'accélération haut en m/s²
+        const accelerationThresholdLow = 45; // Seuil d'accélération bas en m/s²
+        const accelerationThresholdHigh = 55; // Seuil d'accélération haut en m/s²
 
         function handleMotion(event) {
             const accelerationX = event.accelerationIncludingGravity.x;
@@ -154,6 +154,7 @@
             // Affichage de l'accélération linéaire
             document.getElementById('acceleration').innerText = linearAcceleration.toFixed(2);
 
+            // Vérification de la plage d'accélération et émission d'un "bip"
             if (linearAcceleration >= accelerationThresholdLow && linearAcceleration <= accelerationThresholdHigh) {
                 beep();
             }
@@ -207,8 +208,7 @@
 
         // Fonction pour émettre un "bip"
         function beep() {
-            // Vous pouvez remplacer cette fonction par une notification sonore de votre choix
-            console.log("Bip!");
+            oscillator.frequency.value=440;
         }
 
         // Écouteur d'événement pour le bouton "Start Pendulum"
