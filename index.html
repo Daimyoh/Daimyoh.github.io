@@ -139,8 +139,8 @@
         let maxAngularSpeed;
         let lastLinearSpeed;
         const armLength = 0.7; // Longueur de votre bras en mètres
-        const accelerationThresholdLow = 33; // Seuil d'accélération bas en m/s²
-        const accelerationThresholdHigh = 37; // Seuil d'accélération haut en m/s²
+        const accelerationThresholdLow = 20; // Seuil d'accélération bas en m/s²
+        const accelerationThresholdHigh = 24; // Seuil d'accélération haut en m/s²
         const angleThresholdLow = -5; // Seuil d'angle bas par rapport à la verticale en degrés
         const angleThresholdHigh = 5; // Seuil d'angle haut par rapport à la verticale en degrés
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
