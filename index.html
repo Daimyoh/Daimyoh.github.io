@@ -163,7 +163,7 @@
             document.getElementById('acceleration').innerText = calibrationMode ? "0.00" : linearAcceleration.toFixed(2);
 
             // Mise à jour de la valeur maximale d'accélération
-            if (!calibrationMode) {
+            if (calibrationMode) {
                 maxLinearAcceleration = Math.max(maxLinearAcceleration, linearAcceleration);
             }
 
