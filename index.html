@@ -132,12 +132,32 @@
     <button id="startButton">Start Pendulum</button>
     <p>Vertical Angle: <span id="angle">0</span> degrees</p>
     <p>Linear Speed: <span id="speed">0</span> m/s</p>
+    <p>Linear Acceleration: <span id="acceleration">0</span> m/s²</p>
 
     <script>
         let startTime;
         let startBeta;
         let maxAngularSpeed;
+        let lastLinearSpeed;
         const armLength = 0.7; // Longueur de votre bras en mètres
+        const accelerationThresholdLow = 9; // Seuil d'accélération bas en m/s²
+        const accelerationThresholdHigh = 11; // Seuil d'accélération haut en m/s²
+
+        function handleMotion(event) {
+            const accelerationX = event.accelerationIncludingGravity.x;
+            const accelerationY = event.accelerationIncludingGravity.y;
+            const accelerationZ = event.accelerationIncludingGravity.z;
+
+            // Calcul de l'accélération linéaire
+            const linearAcceleration = Math.sqrt(accelerationX**2 + accelerationY**2 + accelerationZ**2);
+
+            // Affichage de l'accélération linéaire
+            document.getElementById('acceleration').innerText = linearAcceleration.toFixed(2);
+
+            if (linearAcceleration >= accelerationThresholdLow && linearAcceleration <= accelerationThresholdHigh) {
+                beep();
+            }
+        }
 
         function handleOrientation(event) {
             const beta = event.beta; // Angle par rapport à la verticale, en degrés
@@ -148,6 +168,7 @@
                     startTime = new Date().getTime();
                     startBeta = beta;
                     maxAngularSpeed = 0;
+                    lastLinearSpeed = 0;
                 } else {
                     // Calcul de la différence d'angle et du temps écoulé
                     const deltaTime = (new Date().getTime() - startTime) / 1000; // en secondes
@@ -162,19 +183,37 @@
                     // Mise à jour de la vitesse angulaire maximale
                     maxAngularSpeed = Math.max(maxAngularSpeed, Math.abs(angularSpeed));
 
-                    // Affichage de l'angle, de la vitesse angulaire maximale et de la vitesse linéaire
+                    // Conversion de l'angle en radians
+                    const angleRadians = (beta * Math.PI) / 180;
+
+                    // Calcul de la distance parcourue le long de l'arc
+                    const distance = angleRadians * armLength;
+
+                    // Calcul de la vitesse linéaire
+                    const linearSpeed = distance / deltaTime;
+
+                    // Affichage de l'angle, de la vitesse angulaire maximale, de la vitesse linéaire
+                    // et de l'accélération linéaire
                     document.getElementById('angle').innerText = beta.toFixed(2);
                     document.getElementById('speed').innerText = maxAngularSpeed.toFixed(2);
 
                     // Mise à jour des valeurs pour la prochaine itération
                     startTime = new Date().getTime();
                     startBeta = beta;
+                    lastLinearSpeed = linearSpeed;
                 }
             }
         }
 
+        // Fonction pour émettre un "bip"
+        function beep() {
+            // Vous pouvez remplacer cette fonction par une notification sonore de votre choix
+            console.log("Bip!");
+        }
+
         // Écouteur d'événement pour le bouton "Start Pendulum"
         document.getElementById('startButton').addEventListener('click', function () {
+            window.addEventListener('devicemotion', handleMotion);
             window.addEventListener('deviceorientation', handleOrientation);
         });
     </script>
