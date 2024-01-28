@@ -158,6 +158,9 @@
             if (linearAcceleration >= accelerationThresholdLow && linearAcceleration <= accelerationThresholdHigh) {
                 beep();
             }
+            else{
+                mute_beep();
+            }
         }
 
         function handleOrientation(event) {
@@ -209,6 +212,9 @@
         // Fonction pour émettre un "bip"
         function beep() {
             oscillator.frequency.value=440;
+        }
+        function mute_beep(){
+            oscillator.frequency.value=0;
         }
 
         // Écouteur d'événement pour le bouton "Start Pendulum"
