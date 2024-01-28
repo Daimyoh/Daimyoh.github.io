@@ -130,16 +130,19 @@
 <body>
     <h1>Phone Pendulum</h1>
     <button id="startButton">Start Pendulum</button>
+    <button id="calibrationButton">Phase de calibrage</button>
     <p>Vertical Angle: <span id="angle">0</span> degrees</p>
     <p>Linear Speed: <span id="speed">0</span> m/s</p>
     <p>Linear Acceleration: <span id="acceleration">0</span> m/s²</p>
-    <script src="audio.js"></script>
+
     <script>
         let startTime;
         let startBeta;
         let maxAngularSpeed;
         let lastLinearSpeed;
+        let maxLinearAcceleration;
         const armLength = 0.7; // Longueur de votre bras en mètres
+
         const accelerationThresholdLow = 45; // Seuil d'accélération bas en m/s²
         const accelerationThresholdHigh = 55; // Seuil d'accélération haut en m/s²
 
@@ -154,12 +157,12 @@
             // Affichage de l'accélération linéaire
             document.getElementById('acceleration').innerText = linearAcceleration.toFixed(2);
 
+            // Mise à jour de la valeur maximale d'accélération
+            maxLinearAcceleration = Math.max(maxLinearAcceleration, linearAcceleration);
+
             // Vérification de la plage d'accélération et émission d'un "bip"
-            if (linearAcceleration>=10){//(linearAcceleration >= accelerationThresholdLow && linearAcceleration <= accelerationThresholdHigh) {
+            if (linearAcceleration >= accelerationThresholdLow && linearAcceleration <= accelerationThresholdHigh) {
                 beep();
-            }
-            else{
-                mute_beep();
             }
         }
 
@@ -173,6 +176,7 @@
                     startBeta = beta;
                     maxAngularSpeed = 0;
                     lastLinearSpeed = 0;
+                    maxLinearAcceleration = 0;
                 } else {
                     // Calcul de la différence d'angle et du temps écoulé
                     const deltaTime = (new Date().getTime() - startTime) / 1000; // en secondes
@@ -211,16 +215,20 @@
 
         // Fonction pour émettre un "bip"
         function beep() {
-            oscillator.frequency.value=440;
-        }
-        function mute_beep(){
-            oscillator.frequency.value=0;
+            // Vous pouvez remplacer cette fonction par une notification sonore de votre choix
+            console.log("Bip!");
         }
 
         // Écouteur d'événement pour le bouton "Start Pendulum"
         document.getElementById('startButton').addEventListener('click', function () {
             window.addEventListener('devicemotion', handleMotion);
             window.addEventListener('deviceorientation', handleOrientation);
+        });
+
+        // Écouteur d'événement pour le bouton "Phase de calibrage"
+        document.getElementById('calibrationButton').addEventListener('click', function () {
+            document.getElementById('acceleration').innerText = maxLinearAcceleration.toFixed(2);
+            maxLinearAcceleration = 0; // Réinitialisation de la valeur maximale
         });
     </script>
 </body>
