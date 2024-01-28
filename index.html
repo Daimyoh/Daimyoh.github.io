@@ -131,13 +131,14 @@
     <button id="startButton">Start Pendulum</button>
     <p>Vertical Angle: <span id="angle">0</span> degrees</p>
     <p>Linear Speed: <span id="speed">0</span> m/s</p>
-    <p>Linear Acceleration: <span id="acceleration">0</span> m/s²</p>
+    <p>Max Linear Acceleration (last 5 seconds): <span id="maxAcceleration">0</span> m/s²</p>
 
     <script>
         let startTime;
         let startBeta;
         let maxAngularSpeed;
         let lastLinearSpeed;
+        let accelerationData = [];
         const armLength = 0.7; // Longueur de votre bras en mètres
         const accelerationThresholdLow = 9; // Seuil d'accélération bas en m/s²
         const accelerationThresholdHigh = 11; // Seuil d'accélération haut en m/s²
@@ -150,8 +151,18 @@
             // Calcul de l'accélération linéaire
             const linearAcceleration = Math.sqrt(accelerationX**2 + accelerationY**2 + accelerationZ**2);
 
-            // Affichage de l'accélération linéaire
-            document.getElementById('acceleration').innerText = linearAcceleration.toFixed(2);
+            // Mise à jour de l'ensemble de données d'accélération
+            accelerationData.push(linearAcceleration);
+
+            // Nettoyer les données plus anciennes que 5 secondes
+            const currentTime = new Date().getTime();
+            accelerationData = accelerationData.filter(entry => currentTime - entry.time < 5000);
+
+            // Calculer le maximum de l'accélération linéaire dans la fenêtre de 5 secondes
+            const maxAcceleration = accelerationData.reduce((max, entry) => Math.max(max, entry.value), 0);
+
+            // Affichage de l'accélération linéaire maximale dans les 5 dernières secondes
+            document.getElementById('maxAcceleration').innerText = maxAcceleration.toFixed(2);
 
             if (linearAcceleration >= accelerationThresholdLow && linearAcceleration <= accelerationThresholdHigh) {
                 beep();
@@ -168,6 +179,7 @@
                     startBeta = beta;
                     maxAngularSpeed = 0;
                     lastLinearSpeed = 0;
+                    accelerationData = [];
                 } else {
                     // Calcul de la différence d'angle et du temps écoulé
                     const deltaTime = (new Date().getTime() - startTime) / 1000; // en secondes
@@ -191,8 +203,7 @@
                     // Calcul de la vitesse linéaire
                     const linearSpeed = distance / deltaTime;
 
-                    // Affichage de l'angle, de la vitesse angulaire maximale, de la vitesse linéaire
-                    // et de l'accélération linéaire
+                    // Affichage de l'angle et de la vitesse angulaire maximale
                     document.getElementById('angle').innerText = beta.toFixed(2);
                     document.getElementById('speed').innerText = maxAngularSpeed.toFixed(2);
 
@@ -218,3 +229,4 @@
     </script>
 </body>
 </html>
+
