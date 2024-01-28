@@ -141,6 +141,8 @@
         const armLength = 0.7; // Longueur de votre bras en mètres
         const accelerationThresholdLow = 33; // Seuil d'accélération bas en m/s²
         const accelerationThresholdHigh = 37; // Seuil d'accélération haut en m/s²
+        const angleThresholdLow = -5; // Seuil d'angle bas par rapport à la verticale en degrés
+        const angleThresholdHigh = 5; // Seuil d'angle haut par rapport à la verticale en degrés
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         let oscillator;
 
@@ -155,12 +157,21 @@
             // Affichage de l'accélération linéaire
             document.getElementById('acceleration').innerText = linearAcceleration.toFixed(2);
 
-            // Vérification de la plage d'accélération et émission d'un son
-            if (linearAcceleration > accelerationThresholdLow && linearAcceleration <= accelerationThresholdHigh) {
+            // Vérification des conditions d'accélération et d'angle pour émission du son
+            if (
+                linearAcceleration > accelerationThresholdLow &&
+                linearAcceleration <= accelerationThresholdHigh &&
+                isAngleInRange()
+            ) {
                 playSound();
             } else {
                 stopSound();
             }
+        }
+
+        function isAngleInRange() {
+            const beta = parseFloat(document.getElementById('angle').innerText);
+            return beta >= angleThresholdLow && beta <= angleThresholdHigh;
         }
 
         function playSound() {
@@ -185,6 +196,9 @@
             const beta = event.beta; // Angle par rapport à la verticale, en degrés
 
             if (beta !== null) {
+                // Mise à jour de l'angle
+                document.getElementById('angle').innerText = beta.toFixed(2);
+
                 if (startTime === undefined) {
                     // Première mesure
                     startTime = new Date().getTime();
@@ -223,6 +237,9 @@
                     startTime = new Date().getTime();
                     startBeta = beta;
                     lastLinearSpeed = linearSpeed;
+
+                    
+            
                 }
             }
         }
@@ -241,4 +258,3 @@
     </script>
 </body>
 </html>
-
